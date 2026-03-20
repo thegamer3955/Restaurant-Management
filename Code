@@ -1,0 +1,96 @@
+import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int choice, item, quantity;
+        double total = 0;
+        double discount = 0;
+        boolean tableBooked = false;
+        int tableNumber = 0;
+        int pizza=0, burger=0, pasta=0, sandwich=0, noodles=0, fries=0, coffee=0, juice=0;
+        do {
+            System.out.println("\n====== RESTAURANT MANAGEMENT SYSTEM ======");
+            System.out.println("1. Book Table");
+            System.out.println("2. View Menu");
+            System.out.println("3. Order Food");
+            System.out.println("4. View Current Order");
+            System.out.println("5. Generate Bill & Exit");
+            System.out.print("Enter your choice: ");
+            choice = sc.nextInt();
+            switch(choice) {
+                case 1:
+                    if(!tableBooked) {
+                        System.out.print("Enter table number (1-10): ");
+                        tableNumber = sc.nextInt();
+                        tableBooked = true;
+                        System.out.println("Table " + tableNumber + " booked successfully!");
+                    } else {
+                        System.out.println("Table already booked: " + tableNumber);
+                    }
+                    break;
+                case 2:
+                    System.out.println("\n------ MENU ------");
+                    System.out.println("1. Pizza       - ₹200");
+                    System.out.println("2. Burger      - ₹120");
+                    System.out.println("3. Pasta       - ₹150");
+                    System.out.println("4. Sandwich    - ₹100");
+                    System.out.println("5. Noodles     - ₹130");
+                    System.out.println("6. French Fries- ₹90");
+                    System.out.println("7. Coffee      - ₹80");
+                    System.out.println("8. Juice       - ₹70");
+                    break;
+                case 3:
+                    System.out.print("Enter item number: ");
+                    item = sc.nextInt();
+                    System.out.print("Enter quantity: ");
+                    quantity = sc.nextInt();
+                    switch(item) {
+                        case 1: pizza += quantity; total += quantity*200; break;
+                        case 2: burger += quantity; total += quantity*120; break;
+                        case 3: pasta += quantity; total += quantity*150; break;
+                        case 4: sandwich += quantity; total += quantity*100; break;
+                        case 5: noodles += quantity; total += quantity*130; break;
+                        case 6: fries += quantity; total += quantity*90; break;
+                        case 7: coffee += quantity; total += quantity*80; break;
+                        case 8: juice += quantity; total += quantity*70; break;
+                        default: System.out.println("Invalid item!");
+                    }
+                    break;
+                case 4:
+                    System.out.println("\n------ CURRENT ORDER ------");
+                    if(pizza>0) System.out.println("Pizza x " + pizza);
+                    if(burger>0) System.out.println("Burger x " + burger);
+                    if(pasta>0) System.out.println("Pasta x " + pasta);
+                    if(sandwich>0) System.out.println("Sandwich x " + sandwich);
+                    if(noodles>0) System.out.println("Noodles x " + noodles);
+                    if(fries>0) System.out.println("French Fries x " + fries);
+                    if(coffee>0) System.out.println("Coffee x " + coffee);
+                    if(juice>0) System.out.println("Juice x " + juice);
+                    break;
+                case 5:
+                    System.out.println("\n======= BILL RECEIPT =======");
+                    if(tableBooked)
+                        System.out.println("Table Number: " + tableNumber);
+                    if(pizza>0) System.out.println("Pizza x " + pizza + " = ₹" + (pizza*200));
+                    if(burger>0) System.out.println("Burger x " + burger + " = ₹" + (burger*120));
+                    if(pasta>0) System.out.println("Pasta x " + pasta + " = ₹" + (pasta*150));
+                    if(sandwich>0) System.out.println("Sandwich x " + sandwich + " = ₹" + (sandwich*100));
+                    if(noodles>0) System.out.println("Noodles x " + noodles + " = ₹" + (noodles*130));
+                    if(fries>0) System.out.println("French Fries x " + fries + " = ₹" + (fries*90));
+                    if(coffee>0) System.out.println("Coffee x " + coffee + " = ₹" + (coffee*80));
+                    if(juice>0) System.out.println("Juice x " + juice + " = ₹" + (juice*70));
+                    if(total > 1000) {
+                        discount = total * 0.10;
+                        System.out.println("Discount (10%) = ₹" + discount);
+                    }
+                    System.out.println("-----------------------------");
+                    System.out.println("Total Amount = ₹" + (total - discount));
+                    System.out.println("Thank you! Visit Again 😊");
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        } while(choice != 5);
+        sc.close();
+    }
+}
