@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodie Pro | Premium Delivery</title>
+    <style>
+        :root {
+            --primary: #ff4757;
+            --primary-hover: #ff6b81;
+            --bg: #f8f9fa;
+            --white: #ffffff;
+            --text: #2f3542;
+            --light-text: #747d8c;
+            --shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        body { 
+	font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+	margin:0; 
+	background: var(--bg); 
+	color: var(--text); 
+	overflow-x: hidden; }
+        
+        header { 
+	background: var(--primary); 	
+	color: white; 	
+	padding: 18px; 
+	text-align: center; 
+	font-weight: 800; 
+	font-size: 26px; 
+	letter-spacing: -1px; 
+	position: sticky; 
+	top: 0; 
+	z-index: 1000; 
+	box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+
+        .search-container { background: white; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; gap: 20px; border-bottom: 1px solid #eee; }
+        
+        .search-box { position: relative; width: 95%; max-width: 600px; display: flex; align-items: center; }
+        .search-box::before { content: '🔍'; position: absolute; left: 20px; font-size: 18px; color: #a4b0be; z-index: 1; }
+        
+        .search-box input { 
+            width: 100%; padding: 15px 25px 15px 55px; border-radius: 50px; border: 1px solid #edf0f2; outline: none; 
+            font-size: 16px; background: #f1f2f6; transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .search-box input:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.1); }
+
+        .filters { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .filters button { padding: 8px 20px; border: none; border-radius: 20px; cursor: pointer; background: #dfe4ea; transition: 0.3s; font-weight: 600; color: var(--text); }
+        .filters button.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3); }
+
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 30px; max-width: 1200px; margin: auto; }
+        
+        .card { background: var(--white); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; transition: transform 0.3s ease; border: 1px solid #f1f1f1; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        
+        .img-container { width: 100%; height: 190px; background: #eee; overflow: hidden; position: relative; }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .time-tag { position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+
+        .card-content { padding: 18px; }
+        .card h3 { margin: 0 0 5px 0; font-size: 1.2rem; }
+        .res-info { color: var(--light-text); font-size: 0.9rem; margin-bottom: 15px; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f8f9fa; padding-top: 12px; }
+        .rating { color: #ffa502; font-weight: bold; }
+        
+        .add-btn { background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .add-btn:hover { background: var(--primary-hover); transform: scale(1.05); }
+
+        .mini-cart { position: fixed; right: 25px; bottom: 25px; background: var(--primary); color: white; padding: 15px 25px; border-radius: 50px; cursor: pointer; box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4); z-index: 1000; display: flex; align-items: center; gap: 12px; font-weight: bold; }
+
+        .cart-sidebar { position: fixed; right: -400px; top: 0; width: 350px; height: 100%; background: white; box-shadow: -5px 0 30px rgba(0,0,0,0.15); z-index: 1001; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 25px; display: flex; flex-direction: column; overflow-y: auto; box-sizing: border-box; }
+        .cart-sidebar.open { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f1f1; padding-bottom: 15px; flex-shrink: 0; }
+        .close-cart { font-size: 28px; cursor: pointer; color: var(--light-text); }
+
+        #cartItems { flex: 1; padding: 20px 0; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .qty-ctrl { display: flex; align-items: center; gap: 10px; background: #f1f2f6; border-radius: 8px; padding: 4px; }
+        .qty-ctrl button { width: 28px; height: 28px; border: none; background: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+        .bill-box { background: #f9fafb; padding: 20px; border-radius: 15px; margin-bottom: 20px; flex-shrink: 0; }
+        .bill-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; }
+        .free-delivery { color: #2ed573; font-weight: bold; font-size: 0.8rem; }
+        .total-row { border-top: 2px dashed #ddd; margin-top: 12px; padding-top: 12px; font-weight: 800; font-size: 1.2rem; color: var(--primary); }
+
+        .checkout-btn { width: 100%; padding: 15px; background: #2ed573; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-bottom: 20px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+<header>Foodie Pro</header>
+
+<div id="mainView">
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Search food or restaurants..." onkeyup="handleSearch()">
+        </div>
+        <div class="filters">
+            <button onclick="filterCategory('All')" class="cat-btn active">All</button>
+            <button onclick="filterCategory('Indian')" class="cat-btn">Indian</button>
+            <button onclick="filterCategory('Fast Food')" class="cat-btn">Fast Food</button>
+            <button onclick="filterCategory('Dessert')" class="cat-btn">Dessert</button>
+        </div>
+    </div>
+    <div class="container" id="foodList"></div>
+</div>
+
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h2>Your Order</h2>
+        <span class="close-cart" onclick="toggleCart()">×</span>
+    </div>
+    <div id="cartItems"></div>
+    
+    <div class="bill-box">
+        <div class="bill-row"><span>Subtotal</span> <span id="subtotal">₹0</span></div>
+        <div class="bill-row"><span>Delivery Fee</span> <span id="delivery">₹40</span></div>
+        <div id="deliveryMessage" class="free-delivery"></div>
+        <div class="bill-row" style="color: #2ed573;"><span>Discount (SAVE50)</span> <span id="discount">₹0</span></div>
+        <div class="bill-row"><span>Taxes (5%)</span> <span id="tax">₹0</span></div>
+        <div class="bill-row total-row"><span>Total</span> <span id="total">₹0</span></div>
+    </div>
+    <button class="checkout-btn" onclick="placeOrder()">Place Order</button>
+</div>
+
+<div class="mini-cart" onclick="toggleCart()">
+    <span>🛒</span> <span id="mCount">0</span> Items | <span id="mTotal">₹0</span>
+</div>
+
+<script>
+const foods = [
+    {id: 1, name:"Margherita Pizza", price:200, category:"Fast Food", res:"Pizza Hut", time:30, rating: 4.5, img:"https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=80"},
+    {id: 2, name:"Double Patty Burger", price:120, category:"Fast Food", res:"Burger King", time:25, rating: 4.2, img:"https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&q=80"},
+    {id: 3, name:"Hyderabadi Biryani", price:220, category:"Indian", res:"Paradise", time:35, rating: 4.8, img:"https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&q=80"},
+    {id: 4, name:"Masala Dosa", price:80, category:"Indian", res:"A2B", time:20, rating: 4.6, img:"Masala_dosa.JPG"},
+    {id: 5, name:"Chocolate Lava Cake", price:250, category:"Dessert", res:"Baskin Robbins", time:15, rating: 4.9, img:"https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=80"},
+    {id: 6, name:"Paneer Tikka", price:180, category:"Indian", res:"Tandoor Grill", time:25, rating: 4.4, img:"panner_tikka.jpg"},
+    {id: 7, name:"Pepperoni Pizza", price:350, category:"Fast Food", res:"Dominos", time:30, rating: 4.7, img:"https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&q=80"},
+    {id: 8, name:"Chicken Wings", price:190, category:"Fast Food", res:"KFC", time:20, rating: 4.3, img:"https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&q=80"},
+    {id: 9, name:"Butter Chicken", price:280, category:"Indian", res:"Moti Mahal", time:40, rating: 4.8, img:"Butter_chicken.jpg"},
+    {id: 10, name:"Red Velvet Pastry", price:150, category:"Dessert", res:"The Cake Shop", time:10, rating: 4.5, img:"https://images.unsplash.com/photo-1616541823729-00fe0aacd32c?w=400&q=80"},
+    {id: 11, name:"Chole Bhature", price:140, category:"Indian", res:"Haldirams", time:25, rating: 4.4, img:"Chole_Bhature.jpg"},
+    {id: 12, name:"Veggie Wrap", price:110, category:"Fast Food", res:"Subway", time:15, rating: 4.1, img:"Veggie_Wrap.jpg"},
+    {id: 13, name:"Gulab Jamun", price:60, category:"Dessert", res:"Sweets Corner", time:10, rating: 4.9, img:"Gulab_Jamun.jpg"},
+    {id: 14, name:"French Fries", price:90, category:"Fast Food", res:"McDonalds", time:15, rating: 4.2, img:"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80"},
+    {id: 15, name:"Mutton Rogan Josh", price:320, category:"Indian", res:"Kashmir Kitchen", time:45, rating: 4.7, img:"https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=400&q=80"},
+    {id: 16, name:"Blueberry Muffin", price:130, category:"Dessert", res:"Starbucks", time:12, rating: 4.4, img:"https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&q=80"},
+    {id: 17, name:"Tacos", price:180, category:"Fast Food", res:"Taco Bell", time:20, rating: 4.3, img:"https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&q=80"},
+    {id: 18, name:"Chicken Tikka Masala", price:260, category:"Indian", res:"Royal Dine", time:35, rating: 4.6, img:"https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&q=80"},
+    {id: 19, name:"Waffles", price:210, category:"Dessert", res:"Waffle Wallah", time:20, rating: 4.7, img:"https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=400&q=80"},
+    {id: 20, name:"Nuggets", price:160, category:"Fast Food", res:"Burger King", time:15, rating: 4.1, img:"https://images.unsplash.com/photo-1562967914-608f82629710?w=400&q=80"},
+    {id: 21, name:"Idli Sambar", price:70, category:"Indian", res:"MTR", time:15, rating: 4.5, img:"https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&q=80"},
+    {id: 22, name:"Cheesecake", price:280, category:"Dessert", res:"Cheesecake Factory", time:15, rating: 4.9, img:"https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=400&q=80"},
+    {id: 23, name:"Hot Dog", price:100, category:"Fast Food", res:"Street Eats", time:10, rating: 4.0, img:"https://images.unsplash.com/photo-1612392062631-94dd858cba88?w=400&q=80"},
+    {id: 24, name:"Malai Kofta", price:220, category:"Indian", res:"Veg Delight", time:30, rating: 4.6, img:"Malai_kofta.jpg"},
+    {id: 25, name:"Brownie", price:120, category:"Dessert", res:"Choco Fix", time:10, rating: 4.8, img:"https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&q=80"}
+];
+
+let cart = [];
+let activeCat = 'All';
+
+function render(items) {
+    const list = document.getElementById('foodList');
+    list.innerHTML = items.length ? '' : '<div style="grid-column:1/-1; text-align:center; padding:50px;">No results found.</div>';
+    items.forEach(f => {
+        list.innerHTML += `<div class="card"><div class="img-container"><img src="${f.img}" alt="${f.name}" onerror="this.src='https://via.placeholder.com/400x200?text=Food'"><span class="time-tag">${f.time} mins</span></div><div class="card-content"><div style="display:flex; justify-content:space-between; align-items:center;"><h3>${f.name}</h3><span class="rating">★ ${f.rating}</span></div><p class="res-info">${f.res} • ${f.category}</p><div class="card-footer"><strong style="font-size:1.2rem;">₹${f.price}</strong><button class="add-btn" onclick="addToCart(${f.id})">Add +</button></div></div></div>`;
+    });
+}
+
+function handleSearch() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const filtered = foods.filter(f => (f.name.toLowerCase().includes(q) || f.res.toLowerCase().includes(q)) && (activeCat === 'All' || f.category === activeCat));
+    render(filtered);
+}
+
+function filterCategory(cat) {
+    activeCat = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.innerText === cat));
+    handleSearch();
+}
+
+function addToCart(id) {
+    const item = foods.find(f => f.id === id);
+    const inCart = cart.find(c => c.id === id);
+    if(inCart) inCart.qty++;
+    else cart.push({...item, qty: 1});
+    updateCartUI();
+}
+
+function updateCartUI() {
+    const cItems = document.getElementById('cartItems');
+    cItems.innerHTML = cart.length ? '' : '<p style="text-align:center; margin-top:40px; color:#999;">Your cart is empty</p>';
+    let sub = 0; let count = 0;
+    cart.forEach((item, i) => {
+        sub += item.price * item.qty;
+        count += item.qty;
+        cItems.innerHTML += `<div class="cart-item"><div style="flex:1"><div style="font-weight:bold">${item.name}</div><div style="font-size:0.8rem; color:#777">₹${item.price}</div></div><div class="qty-ctrl"><button onclick="changeQty(${i}, -1)">-</button><span>${item.qty}</span><button onclick="changeQty(${i}, 1)">+</button></div><div style="width:70px; text-align:right; font-weight:bold">₹${item.price * item.qty}</div></div>`;
+    });
+    
+    let delFee = (sub > 500 || sub === 0) ? 0 : 40;
+    let disc = (sub >= 300) ? 50 : 0;
+    let tax = Math.round((sub - disc) * 0.05);
+    if (tax < 0) tax = 0;
+    let total = sub - disc + delFee + tax;
+    if (total < 0) total = 0;
+
+    document.getElementById('subtotal').innerText = '₹' + sub;
+    document.getElementById('delivery').innerText = delFee === 0 ? 'FREE' : '₹' + delFee;
+    document.getElementById('delivery').style.color = delFee === 0 ? '#2ed573' : '#2f3542';
+    document.getElementById('discount').innerText = '-₹' + disc;
+    document.getElementById('deliveryMessage').innerText = (sub > 0 && sub <= 500) ? `Add ₹${501 - sub} more for FREE delivery!` : '';
+    document.getElementById('tax').innerText = '₹' + tax;
+    document.getElementById('total').innerText = '₹' + total;
+    document.getElementById('mCount').innerText = count;
+    document.getElementById('mTotal').innerText = total;
+}
+
+function changeQty(idx, delta) {
+    cart[idx].qty += delta;
+    if(cart[idx].qty <= 0) cart.splice(idx, 1);
+    updateCartUI();
+}
+
+function toggleCart() { document.getElementById('cartSidebar').classList.toggle('open'); }
+function placeOrder() { if(!cart.length) return alert("Cart is empty!"); alert("🚀 Order Placed!"); cart = []; updateCartUI(); toggleCart(); }
+
+render(foods);
+</script>
+</body>
+</html>
